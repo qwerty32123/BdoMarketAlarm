@@ -14,6 +14,7 @@ class GameItem:
         self.TimeStamp_posted = timestamp_posted
         self.name = self.getName()
         self.EnchanmentString = self.setEnchanmentLevel()
+        self.item_type = self.get_item_type()
 
         super().__init__()
 
@@ -22,7 +23,7 @@ class GameItem:
 
     def getName(self):
 
-        r = requests.get('https://bdocodex.com/us/item/{}/'.format(self.id),proxies=proxies)
+        r = requests.get('https://bdocodex.com/us/item/{}/'.format(self.id))
         soup = BeautifulSoup(r.text, "html.parser")
         item_name = soup.find('title').text.replace('- BDO Codex', '')
         return item_name
@@ -32,6 +33,21 @@ class GameItem:
         now = datetime.now()
         result = s - now
         return str(result)
+
+    def get_item_type(self):
+        r = requests.get('https://bdocodex.com/us/item/{}/'.format(self.id))
+        soup = BeautifulSoup(r.text, "html.parser")
+        item_name = soup.find('title').text.replace('- BDO Codex', '')
+        span = soup.find("span", id="accuracy")
+        text = ""
+
+        if ("Blackstar" in item_name) and (span.text == "20"):
+            text = "main"
+        if ("Blackstar" in item_name) and (span.text == "0"):
+            text = "awa"
+        if "Manos" in item_name:
+            text = "manos"
+        return text
 
     def setEnchanmentLevel(self):
         if self.enhancement == 0:
@@ -78,3 +94,4 @@ class GameItem:
             return "PEN"
 
 
+blackastar = GameItem(715007,20)
